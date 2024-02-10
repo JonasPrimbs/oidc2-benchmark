@@ -1,0 +1,117 @@
+<mat-toolbar color="primary">
+  <span>OIDC² Benchmark</span>
+  <span class="spacer"></span>
+  <span *ngIf="authenticated">{{ username }}</span>
+  <button *ngIf="!authenticated" mat-stroked-button (click)="login()">Login</button>
+  <button *ngIf="authenticated" mat-stroked-button (click)="logout()">Logout</button>
+</mat-toolbar>
+
+<div>
+  <mat-form-field style="width: 500px">
+    <mat-label>Issuer</mat-label>
+    <input matInput required type="url" [(ngModel)]="issuer">
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="!idtEvaluationFinished" (click)="applyIssuer()">
+    Apply
+  </button>
+</div>
+
+<mat-accordion multi>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        ID Token
+      </mat-panel-title>
+      <mat-panel-description>
+        Benchmark ID Token generation performance.
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="idTokenOptions" (ngSubmit)="startIdToken()">
+      <mat-form-field>
+        <mat-label>Time (in seconds)</mat-label>
+        <input matInput formControlName="time" min="1" required type="number">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Rounds</mat-label>
+        <input matInput formControlName="rounds" min="1" required type="number">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="!idtEvaluationFinished">
+        Start
+      </button>
+    </form>
+
+    <div *ngIf="idtEvaluationStarted">
+      <ul>
+        <li *ngFor="let n of idtResults; let i = index">
+          Test #{{ i + 1 }} finished with {{ n }} ID Tokens in {{ idtTime }} seconds.
+        </li>
+
+        <li *ngIf="nIdt !== idtRounds">
+          Test #{{ nIdt + 1 }} running...
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="idtResults.length !== 0">
+      <button mat-icon-button (click)="downloadIdtData()">
+        <mat-icon>download</mat-icon>
+      </button>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        ID Certification Token
+      </mat-panel-title>
+      <mat-panel-description>
+        Benchmark ID Certification Token generation performance.
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="idCertificationTokenOptions" (ngSubmit)="startIdCertificationToken()">
+      <mat-form-field>
+        <mat-label>Time (in seconds)</mat-label>
+        <input matInput formControlName="time" min="1" required type="number">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Rounds</mat-label>
+        <input matInput formControlName="rounds" min="1" required type="number">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Signature Algorithm</mat-label>
+        <mat-select formControlName="sigAlg">
+          <mat-option *ngFor="let sigAlg of typeList" [value]="sigAlg">{{sigAlg}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="!ictEvaluationFinished">
+        Start
+      </button>
+    </form>
+      
+    <div *ngIf="ictEvaluationStarted">
+      <ul>
+        <li *ngFor="let n of ictResults; let i = index">
+          Test #{{ i + 1 }} finished with {{ n }} ID Certification Tokens in {{ ictTime }} seconds.
+        </li>
+
+        <li *ngIf="nIct !== ictRounds">
+          Test #{{ nIct + 1 }} running...
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="ictResults.length !== 0">
+      <button mat-icon-button (click)="downloadIctData()">
+        <mat-icon>download</mat-icon>
+      </button>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
